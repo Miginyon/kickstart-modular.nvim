@@ -5,16 +5,44 @@ return {
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+    priority = 1000, -- Ensures this loads before other plugins
+    config = function()
+      -- Setting up the Tokyonight theme with specific options
+      require('tokyonight').setup {
+        style = 'night', -- Choose the style you prefer, options are: 'storm', 'night', 'moon', 'day'
+        transparent = false, -- Disables transparency
+        dim_inactive = true, -- Dims inactive windows to help focus on the active window
+        terminal_colors = true, -- Ensures terminal uses the theme's colors
+        -- Additional settings as needed
+        styles = {
+          comments = 'italic',
+          keywords = 'italic',
+          functions = {},
+          variables = {},
+          sidebars = 'dark',
+          floats = 'dark',
+        },
+        sidebars = { 'qf', 'help', 'vista_kind', 'terminal', 'packer' },
+      }
 
-      -- You can configure highlights by doing something like:
+      -- Activating the theme
+      vim.cmd.colorscheme 'tokyonight'
+      -- Additional highlight customizations
       vim.cmd.hi 'Comment gui=none'
     end,
   },
 }
--- vim: ts=2 sts=2 sw=2 et
+-- 'folke/tokyonight.nvim',
+-- priority = 1000, -- Make sure to load this before all the other start plugins.
+-- init = function()
+--   -- Load the colorscheme here.
+--   -- Like many other themes, this one has different styles, and you could load
+--   -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+--   vim.cmd.colorscheme 'tokyonight-night'
+
+--   -- You can configure highlights by doing something like:
+--   vim.cmd.hi 'Comment gui=none'
+-- end,
+-- },
+-- }
+-- -- vim: ts=2 sts=2 sw=2 et

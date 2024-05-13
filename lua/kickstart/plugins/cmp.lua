@@ -19,12 +19,12 @@ return {
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -33,13 +33,41 @@ return {
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-cmdline',
       'hrsh7th/cmp-path',
     },
     config = function()
       -- See `:help cmp`
+
+      local lspkind = require 'lspkind'
+
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+
+      -- `/` cmdline setup.
+      cmp.setup.cmdline('/', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' },
+        },
+      })
+
+      -- `:` cmdline setup.
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' },
+        }, {
+          {
+            name = 'cmdline',
+            option = {
+              ignore_cmds = { 'Man', '!' },
+            },
+          },
+        }),
+      })
 
       cmp.setup {
         snippet = {
@@ -47,6 +75,69 @@ return {
             luasnip.lsp_expand(args.body)
           end,
         },
+
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
+
+        formatting = {
+          expandable_indicator = true,
+          fields = { 'abbr', 'kind' },
+          format = lspkind.cmp_format {
+            mode = 'symbol_text', -- show only symbol annotations
+            symbol_map = {
+              Copilot = '',
+              calc = '',
+              Text = '  ',
+              Method = '  ',
+              Function = '  ',
+              Constructor = '  ',
+              Field = '  ',
+              Variable = '  ',
+              Class = '  ',
+              Interface = '  ',
+              Module = '  ',
+              Property = '  ',
+              Unit = '  ',
+              Value = '  ',
+              Enum = '  ',
+              Keyword = '  ',
+              Snippet = '  ',
+              Color = '  ',
+              File = '  ',
+              Reference = '  ',
+              Folder = '  ',
+              EnumMember = '  ',
+              Constant = '  ',
+              Struct = '  ',
+              Event = '  ',
+              Operator = '  ',
+              TypeParameter = '  ',
+            },
+          },
+        },
+
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            require('copilot_cmp.comparators').prioritize,
+
+            -- Below is the default comparitor list and order for nvim-cmp
+            cmp.config.compare.offset,
+            -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.locality,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
+        },
+
+        preselect = 'item',
         completion = { completeopt = 'menu,menuone,noinsert' },
 
         -- For an understanding of why these mappings were
@@ -102,9 +193,13 @@ return {
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          -- Copilot Source
+          { name = 'copilot' },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'calc' },
+          { name = 'buffer' },
         },
       }
     end,

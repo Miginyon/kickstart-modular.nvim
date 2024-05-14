@@ -84,39 +84,91 @@ return {
         formatting = {
           expandable_indicator = true,
           fields = { 'abbr', 'kind' },
-          format = lspkind.cmp_format {
-            mode = 'symbol_text', -- show only symbol annotations
-            symbol_map = {
-              Copilot = '',
-              calc = '',
-              Text = '  ',
-              Method = '  ',
-              Function = '  ',
-              Constructor = '  ',
-              Field = '  ',
-              Variable = '  ',
-              Class = '  ',
-              Interface = '  ',
-              Module = '  ',
-              Property = '  ',
-              Unit = '  ',
-              Value = '  ',
-              Enum = '  ',
-              Keyword = '  ',
-              Snippet = '  ',
-              Color = '  ',
-              File = '  ',
-              Reference = '  ',
-              Folder = '  ',
-              EnumMember = '  ',
-              Constant = '  ',
-              Struct = '  ',
-              Event = '  ',
-              Operator = '  ',
-              TypeParameter = '  ',
-            },
-          },
+          format = function(entry, vim_item)
+            -- Check if the source is command line related
+            if entry.source.name == 'cmdline' then
+              -- Remove the kind field entirely for cmdline completions
+              vim_item.kind = nil
+              return vim_item
+            end
+            -- Apply lspkind formatting only for specific sources
+            if entry.source.name == 'nvim_lsp' or entry.source.name == 'luasnip' then
+              return lspkind.cmp_format {
+                mode = 'symbol_text', -- use symbol with text
+                maxwidth = 50, -- prevent the popup from showing too much information
+                symbol_map = {
+                  Copilot = '',
+                  calc = '',
+                  Text = '  ',
+                  Method = '  ',
+                  Function = '  ',
+                  Constructor = '  ',
+                  Field = '  ',
+                  Variable = '  ',
+                  Class = '  ',
+                  Interface = '  ',
+                  Module = '  ',
+                  Property = '  ',
+                  Unit = '  ',
+                  Value = '  ',
+                  Enum = '  ',
+                  Keyword = '  ',
+                  Snippet = '  ',
+                  Color = '  ',
+                  File = '  ',
+                  Reference = '  ',
+                  Folder = '  ',
+                  EnumMember = '  ',
+                  Constant = '  ',
+                  Struct = '  ',
+                  Event = '  ',
+                  Operator = '  ',
+                  TypeParameter = '  ',
+                },
+              }(entry, vim_item)
+            end
+            -- Default formatting for others
+            return vim_item
+          end,
         },
+
+        -- NOTE reinstate this if you want icons/names in cmdline autocmp.
+        -- formatting = {
+        --   expandable_indicator = true,
+        --   fields = { 'abbr', 'kind' },
+        --   format = lspkind.cmp_format {
+        --     mode = 'symbol_text', -- show only symbol annotations
+        --     symbol_map = {
+        --       Copilot = '',
+        --       calc = '',
+        --       Text = '  ',
+        --       Method = '  ',
+        --       Function = '  ',
+        --       Constructor = '  ',
+        --       Field = '  ',
+        --       Variable = '  ',
+        --       Class = '  ',
+        --       Interface = '  ',
+        --       Module = '  ',
+        --       Property = '  ',
+        --       Unit = '  ',
+        --       Value = '  ',
+        --       Enum = '  ',
+        --       Keyword = '  ',
+        --       Snippet = '  ',
+        --       Color = '  ',
+        --       File = '  ',
+        --       Reference = '  ',
+        --       Folder = '  ',
+        --       EnumMember = '  ',
+        --       Constant = '  ',
+        --       Struct = '  ',
+        --       Event = '  ',
+        --       Operator = '  ',
+        --       TypeParameter = '  ',
+        --     },
+        --   },
+        -- },
 
         sorting = {
           priority_weight = 2,
